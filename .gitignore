@@ -1,0 +1,4 @@
+.DS_Store
+lib/arm64-ios
+lib/armv7-ios
+res
