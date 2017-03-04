@@ -13,32 +13,10 @@ const int NON_SKIPPABLE_VIDEO = 256;
 
 namespace dmScript
 {
-    /**
-     * Retrieve current instance from the global table and place it on the top of the stack, only valid when set.
-     * @param lua state
-     */
     void GetInstance(lua_State* L);
-    /**
-     * Set the value on the top of the stack as the instance into the global table and pops it from the stack.
-     * @param lua state
-     */
     void SetInstance(lua_State* L);
-    /**
-     * Check if the instance in the lua state is valid. The instance is assumed to have been previously set by SetInstance.
-     * @param lua state
-     * @return whether the instance is valid
-     */
     bool IsInstanceValid(lua_State* L);
- 
-    /**
-     * Retrieve the main thread lua state from any lua state (main thread or coroutine).
-     * @param lua state
-     * @return the main thread lua state
-     */
     lua_State* GetMainThread(lua_State* L);
-    
-    
-    
 }
 
 
@@ -242,6 +220,14 @@ int apdShowStyle(int adTypes) {
     return 0;
 }
 
+bool get_lua_bool (lua_State* L, int index) {
+	bool bool_var;
+	if (lua_isboolean(L, index))
+        return bool_var = YES;
+    else
+        return bool_var = NO;
+}
+
 //create listener for callbacks
 void Appodeal_Listen(lua_State* L) {	
 	//creating the callback lua ref 
@@ -262,7 +248,7 @@ void Appodeal_Listen(lua_State* L) {
     apd->listener.m_Self = dmScript::Ref(L, LUA_REGISTRYINDEX);
 }
 
-//initialise appodeal sdk and set callback delegates
+//extension methods
 void Appodeal_Initialise(lua_State* L) {    
 	if (![Appodeal isInitalized])	{
 		//parse params from Lua state (key, adType)
@@ -286,14 +272,14 @@ void Appodeal_Initialise(lua_State* L) {
 	}
 }
 
-//showing ad (optional placement)
+//showing ad (optional param: placement)
 void Appodeal_ShowAd(lua_State* L) {
 
 	//parse params from Lua state (key, adType)
 	int showStyle = luaL_checkint(L, 1);
 	
 	//parse placement if exists
-	const char *placement_name = luaL_checkstring(L, 1);	
+	const char *placement_name = luaL_checkstring(L, 2);	
 	
 	//convert placement_name to NSString
 	NSString* placement = [NSString stringWithUTF8String:placement_name];
@@ -305,8 +291,204 @@ void Appodeal_ShowAd(lua_State* L) {
    	 	[Appodeal showAd:(AppodealShowStyle)apdShowStyle(showStyle) rootViewController:[UIApplication sharedApplication].keyWindow.rootViewController];
 }
 
-//hide appodeal banner
 void Appodeal_HideBanner(lua_State* L) {
 	[Appodeal hideBanner];
+}
+
+void Appodeal_DisableNetwork(lua_State* L) {
+	const char *network = luaL_checkstring(L, 1);
+	int adType = luaL_checkint(L, 2);
+	NSString* network_name = [NSString stringWithUTF8String:network];
+	[Appodeal disableNetworkForAdType:(AppodealAdType)apdAdTypes(adType) name: network_name];
+}
+
+void Appodeal_SetLocationTracking(lua_State* L) {
+    [Appodeal setLocationTracking:get_lua_bool(L, 1)];
+}
+
+void Appodeal_SetAutocache(lua_State* L) {
+	int adType = luaL_checkint(L, 2);
+	[Appodeal setAutocache:get_lua_bool(L, 1) types:(AppodealAdType)apdAdTypes(adType)];
+}
+
+void Appodeal_CacheAd(lua_State* L) {
+	int adType = luaL_checkint(L, 1);
+	[Appodeal cacheAd:(AppodealAdType)apdAdTypes(adType)];
+}
+
+void Appodeal_SetDebugEnabled(lua_State* L) {
+	[Appodeal setDebugEnabled:get_lua_bool(L, 1)];
+}
+
+void Appodeal_SetTestingEnabled(lua_State* L) {
+	[Appodeal setTestingEnabled:get_lua_bool(L, 1)];
+}
+
+void Appodeal_SetCustomIntRule(lua_State* L) {
+
+}
+
+void Appodeal_SetCustomBoolRule(lua_State* L) {
+
+}
+
+void Appodeal_SetCustomDoubleRule(lua_State* L) {
+
+}
+
+void Appodeal_SetCustomStringRule(lua_State* L) {
+
+}
+
+void Appodeal_ConfirmUsage(lua_State* L) {
+	int showStyle = luaL_checkint(L, 1);
+	[Appodeal confirmUsage:(AppodealShowStyle)apdShowStyle(showStyle)];
+}
+
+void Appodeal_IsAutocacheEnabled(lua_State* L) {
+	
+}
+
+void Appodeal_IsInitalized(lua_State* L) {
+	
+}
+
+void Appodeal_IsReadyForShowWithStyle(lua_State* L) {
+
+}
+
+void Appodeal_SetSmartBannersEnabled(lua_State* L) {
+	[Appodeal setSmartBannersEnabled:get_lua_bool(L, 1)];
+}
+
+void Appodeal_SetBannerBackgroundVisible(lua_State* L) {
+	[Appodeal setBannerBackgroundVisible:get_lua_bool(L, 1)];
+}
+
+void Appodeal_SetBannerAnimationEnabled(lua_State* L) {
+	[Appodeal setBannerAnimationEnabled:get_lua_bool(L, 1)];
+}
+
+void Appodeal_DisableUserDataForNetwork(lua_State* L) {
+
+}
+
+void Appodeal_SetUserId(lua_State* L) {
+	const char *user_id = luaL_checkstring(L, 1);
+	NSString* user_id_string = [NSString stringWithUTF8String:user_id];
+	[Appodeal setUserId:user_id_string];
+}
+
+void Appodeal_SetUserEmail(lua_State* L) {
+	const char *user_email = luaL_checkstring(L, 1);
+	NSString* user_email_string = [NSString stringWithUTF8String:user_email];
+	[Appodeal setUserEmail:user_email_string];
+}
+
+void Appodeal_SetUserBirthday(lua_State* L) {
+	const char *user_bd = luaL_checkstring(L, 1);
+	NSString* user_bd_string = [NSString stringWithUTF8String:user_bd];
+	NSDateFormatter *dateFormat = [[NSDateFormatter alloc] init];
+    [dateFormat setDateFormat:@"yyyy-MM-dd"];
+    NSDate *date = [dateFormat dateFromString:user_bd_string];
+    [Appodeal setUserBirthday:date];
+}
+
+void Appodeal_SetUserAge(lua_State* L) {
+	int user_age = luaL_checkint(L, 1);
+	[Appodeal setUserAge:user_age];
+}
+
+void Appodeal_SetUserGender(APDDefoldUserGender gender) {
+	switch(gender)
+    {
+    	 case GENDER_OTHER:
+    	 	[Appodeal setUserGender:AppodealUserGenderOther];
+    	 	break;
+    	 case GENDER_FEMALE:
+    	 	[Appodeal setUserGender:AppodealUserGenderFemale];
+    	 	break;
+    	 case GENDER_MALE:
+    	 	[Appodeal setUserGender:AppodealUserGenderMale]; 
+    	 	break;
+    }
+}
+
+void Appodeal_SetUserOccupation(APDDefoldUserOccupation occupation) {
+	switch(occupation)
+    {
+    	 case OCCUPATION_OTHER:
+    	 	[Appodeal setUserOccupation:AppodealUserOccupationOther];
+    	 	break;
+    	 case OCCUPATION_WORK:
+    	 	[Appodeal setUserOccupation:AppodealUserOccupationWork];
+    	 	break;
+    	 case OCCUPATION_SCHOOL:
+    	 	[Appodeal setUserOccupation:AppodealUserOccupationSchool]; 
+    	 	break;
+    	 case OCCUPATION_UNIVERSITY:
+    	 	[Appodeal setUserOccupation:AppodealUserOccupationUniversity]; 
+    	 	break;    	 	
+    }
+}
+
+void Appodeal_SetUserRelationship(APDDefoldUserRelationship relationship) {
+	switch(relationship)
+    {
+    	 case RELATIONSHIP_OTHER:
+    	 	[Appodeal setUserRelationship:AppodealUserRelationshipOther];
+    	 	break;
+    	 case RELATIONSHIP_SINGLE:
+    	 	[Appodeal setUserRelationship:AppodealUserRelationshipSingle];
+    	 	break;
+    	 case RELATIONSHIP_DATING:
+    	 	[Appodeal setUserRelationship:AppodealUserRelationshipDating]; 
+    	 	break;
+    	 case RELATIONSHIP_ENGAGED:
+    	 	[Appodeal setUserRelationship:AppodealUserRelationshipEngaged]; 
+    	 	break;    	 	
+    	 case RELATIONSHIP_MARRIED:
+    	 	[Appodeal setUserRelationship:AppodealUserRelationshipMarried];
+    	 	break;
+    	 case RELATIONSHIP_SEARCHING:
+    	 	[Appodeal setUserRelationship:AppodealUserRelationshipSearching];
+    	 	break;	
+    }
+}
+
+void Appodeal_SetUserSmokingAttitude(APDDefoldUserSmokingAttitude smokingAttitude) {
+	switch(smokingAttitude)
+    {
+    	 case SMOKING_NEGATIVE:
+    	 	[Appodeal setUserSmokingAttitude:AppodealUserSmokingAttitudeNegative];
+    	 	break;
+    	 case SMOKING_NEUTRAL:
+    	 	[Appodeal setUserSmokingAttitude:AppodealUserSmokingAttitudeNeutral];
+    	 	break;
+    	 case SMOKING_POSITIVE:
+    	 	[Appodeal setUserSmokingAttitude:AppodealUserSmokingAttitudePositive]; 
+    	 	break;
+    }
+}
+
+void Appodeal_SetUserAlcoholAttitude(APDDefoldUserAlcoholAttitude alcoholAttitude) {
+	switch(alcoholAttitude)
+    {
+    	 case ALCOHOL_NEGATIVE:
+    	 	[Appodeal setUserAlcoholAttitude:AppodealUserAlcoholAttitudeNegative];
+    	 	break;
+    	 case ALCOHOL_NEUTRAL:
+    	 	[Appodeal setUserAlcoholAttitude:AppodealUserAlcoholAttitudeNeutral];
+    	 	break;
+    	 case ALCOHOL_POSITIVE:
+    	 	[Appodeal setUserAlcoholAttitude:AppodealUserAlcoholAttitudePositive]; 
+    	 	break;
+    }
+}
+
+void Appodeal_SetUserInterests(lua_State* L) {
+	const char *user_settings = luaL_checkstring(L, 1);
+	NSString* user_settings_string = [NSString stringWithUTF8String:user_settings];
+	[Appodeal setUserInterests:user_settings_string];
 }
 
