@@ -60,7 +60,8 @@ struct AppodealListener {
 
 extern void Appodeal_Listen(lua_State* L);
 extern void Appodeal_Initialise(lua_State* L);
-extern void Appodeal_ShowAd(lua_State* L);   
+extern void Appodeal_ShowAd(lua_State* L);  
+extern void Appodeal_ShowAdWithPlacement(lua_State* L);   
 extern void Appodeal_HideBanner(lua_State* L);   
 extern void Appodeal_DisableNetwork(lua_State* L);
 extern void Appodeal_SetLocationTracking(lua_State* L);
@@ -73,9 +74,9 @@ extern void Appodeal_SetCustomBoolRule(lua_State* L);
 extern void Appodeal_SetCustomDoubleRule(lua_State* L);
 extern void Appodeal_SetCustomStringRule(lua_State* L);
 extern void Appodeal_ConfirmUsage(lua_State* L);
-extern void Appodeal_IsAutocacheEnabled(lua_State* L);
-extern void Appodeal_IsInitalized(lua_State* L);
-extern void Appodeal_IsReadyForShowWithStyle(lua_State* L);
+extern int Appodeal_IsAutocacheEnabled(lua_State* L);
+extern int Appodeal_IsInitialized(lua_State* L);
+extern int Appodeal_IsReadyForShowWithStyle(lua_State* L);
 extern void Appodeal_SetSmartBannersEnabled(lua_State* L);
 extern void Appodeal_SetBannerBackgroundVisible(lua_State* L);
 extern void Appodeal_SetBannerAnimationEnabled(lua_State* L);
