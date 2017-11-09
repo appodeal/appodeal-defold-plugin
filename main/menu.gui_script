@@ -1,0 +1,117 @@
+local dirtylarry = require "dirtylarry/dirtylarry"
+
+function init(self)
+    msg.post(".", "acquire_input_focus")
+    self.radio_value = appodeal.BANNER
+end
+
+local function appodeal_ads_callback(self, msg_type, message)
+	print("Apppodeal Callback msg_type: " .. msg_type .. ", message: " .. message)
+
+	--[[ if msg_type == appodeal.BANNER_LOADED then
+		print("BANNER_LOADED, is precache")
+	elseif msg_type == appodeal.BANNER_FAILED_TO_LOAD then
+		print("BANNER_FAILED_TO_LOAD")
+	elseif msg_type == appodeal.BANNER_SHOWN then
+		print("BANNER_FAILED_TO_LOAD")
+	elseif msg_type == appodeal.BANNER_CLICKED then
+		print("BANNER_CLICKED")
+	elseif msg_type == appodeal.INTERSTITIAL_LOADED then
+		print("INTERSTITIAL_LOADED")
+	elseif msg_type == appodeal.INTERSTITIAL_FAILED_TO_LOAD then
+		print("INTERSTITIAL_FAILED_TO_LOAD")
+	elseif msg_type == appodeal.INTERSTITIAL_SHOWN then
+		print("INTERSTITIAL_SHOWN")
+	elseif msg_type == appodeal.INTERSTITIAL_CLOSED then
+		print("INTERSTITIAL_CLOSED")
+	elseif msg_type == appodeal.INTERSTITIAL_CLICKED then
+		print("INTERSTITIAL_CLICKED")
+	elseif msg_type == appodeal.REWARDED_VIDEO_LOADED then
+		print("REWARDED_VIDEO_LOADED")
+	elseif msg_type == appodeal.REWARDED_VIDEO_FAILED_TO_LOAD then
+		print("REWARDED_VIDEO_FAILED_TO_LOAD")
+	elseif msg_type == appodeal.REWARDED_VIDEO_SHOWN then
+		print("REWARDED_VIDEO_SHOWN")
+	elseif msg_type == appodeal.REWARDED_VIDEO_FISNIHED then
+		print("REWARDED_VIDEO_FISNIHED", message.amount, message.name)
+	elseif msg_type == appodeal.REWARDED_VIDEO_CLOSED then
+		print("REWARDED_VIDEO_CLOSED")
+	elseif msg_type == appodeal.NON_SKIPPABLE_VIDEO_LOADED then
+		print("NON_SKIPPABLE_VIDEO_LOADED")
+	elseif msg_type == appodeal.NON_SKIPPABLE_VIDEO_FAILED_TO_LOAD then
+		print("NON_SKIPPABLE_VIDEO_FAILED_TO_LOAD")
+	elseif msg_type == appodeal.NON_SKIPPABLE_VIDEO_SHOWN then
+		print("NON_SKIPPABLE_VIDEO_SHOWN")
+	elseif msg_type == appodeal.NON_SKIPPABLE_VIDEO_FISNIHED then
+		print("NON_SKIPPABLE_VIDEO_FISNIHED")
+	elseif msg_type == appodeal.NON_SKIPPABLE_VIDEO_CLOSED then
+		print("NON_SKIPPABLE_VIDEO_CLOSED")
+	end --]]
+end
+
+function on_input(self, action_id, action)
+	self.radio_value = dirtylarry:radio("radio_banner", action_id, action, appodeal.BANNER, self.radio_value)
+	self.radio_value = dirtylarry:radio("radio_interstitial", action_id, action, appodeal.INTERSTITIAL, self.radio_value)
+	self.radio_value = dirtylarry:radio("radio_rewarded", action_id, action, appodeal.REWARDED_VIDEO, self.radio_value)
+	self.radio_value = dirtylarry:radio("radio_nonskippable", action_id, action, appodeal.NON_SKIPPABLE_VIDEO, self.radio_value)
+
+	dirtylarry:button("initialize", action_id, action, function ()
+		appodeal.setSmartBanners(false)
+		appodeal.setBannerBackground(false)
+		appodeal.setBannerAnimation(false)
+		appodeal.setTabletBanners(false)
+		appodeal.setLogLevel(appodeal.LOG_LEVEL_VERBOSE)
+		appodeal.setTesting(false)
+		appodeal.setChildDirectedTreatment(false)
+		appodeal.setTriggerOnLoadedOnPrecache(appodeal.INTERSTITIAL, true)
+		appodeal.disableNetwork("inmobi")
+		appodeal.disableNetworkForAdType("adcolony", appodeal.INTERSTITIAL)
+		appodeal.disableLocationPermissionCheck()
+		appodeal.disableWriteExternalStoragePermissionCheck()
+		appodeal.requestAndroidMPermissions()
+		appodeal.muteVideosIfCallsMuted(true)
+		print("Appodeal Native SDK v.", appodeal.getNativeSDKVersion())
+		appodeal.setCustomIntRule("int_rule", 217)
+		appodeal.setCustomBoolRule("bool_rule", true)
+		appodeal.setCustomDoubleRule("double_rule", 2.17)
+		appodeal.setCustomStringRule("string_rule", "my_string")
+		appodeal.trackInAppPurchase(50, "USD")
+		appodeal.setUserId("awesome_user")
+		appodeal.setUserAge(26)
+		appodeal.setUserGender(appodeal.GENDER_MALE)
+		appodeal.setAutoCache(appodeal.INTERSTITIAL, false)
+		--appodeal.setCallback(appodeal_ads_callback)
+		if sys.get_sys_info().system_name == "Android" then
+			appodeal.initialize("fee50c333ff3825fd6ad6d38cff78154de3025546d47a84f", self.radio_value, appodeal_ads_callback)
+		elseif sys.get_sys_info().system_name == "iPhone OS" then
+			appodeal.initialize("4b46ef930cd37cf11da84ae4d41019abb7234d5bbce3f000", self.radio_value, appodeal_ads_callback)
+		end
+    end)
+    
+    dirtylarry:button("show", action_id, action, function ()
+    	appodeal.show(self.radio_value)
+    end)
+    
+    dirtylarry:button("showWithPlacement", action_id, action, function ()
+    	print("isPrecache: ", appodeal.isPrecache)
+    	print("Appodeal Reward Name ", appodeal.getRewardName())
+    	print("Appodeal Reward Amount ", appodeal.getRewardAmount())
+    	print("Appodeal Reward Name for placement: ", appodeal.getRewardName("my_button"))
+    	print("Appodeal Reward Amount for placement: ", appodeal.getRewardAmount("my_button"))
+    	print("Appodeal Ads can be shown: ", appodeal.canShow(self.radio_value))
+    	print("Appodeal Ads can be shown for placement: ", appodeal.canShowWithPlacement(self.radio_value, "my_button"))
+     	if appodeal.isLoaded(self.radio_value) then
+    		appodeal.showWithPlacement(self.radio_value, "my_button")
+    	else
+    		appodeal.cache(self.radio_value)
+    	end
+    end)
+    
+    dirtylarry:button("hide", action_id, action, function ()
+    	appodeal.hide(appodeal.BANNER)
+    end)
+end
+
+function on_reload(self)
+
+end

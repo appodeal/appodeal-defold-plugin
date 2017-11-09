@@ -1,5 +1,6 @@
 #if defined(DM_PLATFORM_ANDROID)
 
+#include "../appodeal_callback.h"
 #include "com_appodeal_defold_AppodealAndroid.h"
 
 #include <dmsdk/sdk.h>
@@ -8,50 +9,6 @@
 #include <dmsdk/dlib/log.h>
 
 const char* appodeal_jar_path = "com/appodeal/defold/AppodealAndroid";
-
-struct AppodealListener {
-  AppodealListener() {
-    m_L = 0;
-    m_Callback = LUA_NOREF;
-    m_Self = LUA_NOREF;
-  }
-  lua_State* m_L;
-  int        m_Callback;
-  int        m_Self;
-};
-
-struct DispatchToLua {
-    AppodealListener listener;
-};
-
-struct APD {
-  AppodealListener listener;
-} g_Apd;
-
-APD* apd;
-
-int send_callback(const char * message, const char * currencyName, int rewardAmount) {
-	apd = &g_Apd;
- 	lua_State* L = apd->listener.m_L;
-    int top = lua_gettop(L);
-    lua_rawgeti(L, LUA_REGISTRYINDEX, apd->listener.m_Callback);
-
-    // Setup self
-   	lua_rawgeti(L, LUA_REGISTRYINDEX, apd->listener.m_Self);
-   	lua_pushvalue(L, -1);
-   	dmScript::SetInstance(L);
-   	lua_pushstring(L, message);
-   	lua_pushstring(L, currencyName);
-   	lua_pushnumber(L, rewardAmount);
-    //dmScript::PushString(L, message);
-    int ret = lua_pcall(L, 4, LUA_MULTRET, 0);
-    if (ret != 0) {
-    	dmLogError("Error running apd callback: %s", lua_tostring(L, -1));
-        lua_pop(L, 1);
-    }
-    assert(top == lua_gettop(L));
-    return 1;
-}
 
 bool get_lua_bool (lua_State* L, int index) {
 	if (lua_isboolean(L, index))
@@ -64,101 +21,81 @@ bool get_lua_bool (lua_State* L, int index) {
 }
 
 JNIEXPORT void JNICALL Java_com_appodeal_defold_AppodealAndroid_onBannerLoaded(JNIEnv *env, jclass jcls) {
-	send_callback("BANNER_LOADED","",0);
+	lua_appodealBannerLoaded();
 }
 
 JNIEXPORT void JNICALL Java_com_appodeal_defold_AppodealAndroid_onBannerFailedToLoad(JNIEnv *env, jclass jcls) {
-	send_callback("BANNERL_FAILED_TO_LOAD","",0);
+	lua_appodealBannerFailed();
 }
 
 JNIEXPORT void JNICALL Java_com_appodeal_defold_AppodealAndroid_onBannerShown(JNIEnv *env, jclass jcls) {
-	send_callback("BANNER_SHOWN","",0);
+	lua_appodealBannerShown();
 }
 
 JNIEXPORT void JNICALL Java_com_appodeal_defold_AppodealAndroid_onBannerClicked(JNIEnv *env, jclass jcls) {
-	send_callback("BANNER_CLICKED","",0);
+	lua_appodealBannerClicked();
 }
 
 JNIEXPORT void JNICALL Java_com_appodeal_defold_AppodealAndroid_onInterstitialLoaded(JNIEnv *env, jclass jcls) {
-	send_callback("INTERSTITIAL_LOADED","",0);
+	lua_appodealInterstitialLoaded();
 }
 
 JNIEXPORT void JNICALL Java_com_appodeal_defold_AppodealAndroid_onInterstitialFiledToLoad(JNIEnv *env, jclass jcls) {
-	send_callback("INTERSTITIAL_FAILED_TO_LOAD","",0);
+	lua_appodealInterstitialFailed();
 }
 
 JNIEXPORT void JNICALL Java_com_appodeal_defold_AppodealAndroid_onInterstitialShown(JNIEnv *env, jclass jcls) {
-	send_callback("INTERSTITIAL_SHOWN","",0);
+	lua_appodealInterstitialShown();
 }
 
 JNIEXPORT void JNICALL Java_com_appodeal_defold_AppodealAndroid_onInterstitialClicked(JNIEnv *env, jclass jcls) {
-	send_callback("INTERSTITIAL_CLICKED","",0);
+	lua_appodealInterstitialClosed();
 }
 
 JNIEXPORT void JNICALL Java_com_appodeal_defold_AppodealAndroid_onInterstitialClosed(JNIEnv *env, jclass jcls) {
-	send_callback("INTERSTITIAL_CLOSED","",0);
+	lua_appodealInterstitialClicked();
 }
 
 JNIEXPORT void JNICALL Java_com_appodeal_defold_AppodealAndroid_onRewardedVideoLoaded(JNIEnv *env, jclass jcls) {
-	send_callback("REWARDED_VIDEO_LOADED","",0);
+	lua_appodealRewardedLoaded();
 }
 
 JNIEXPORT void JNICALL Java_com_appodeal_defold_AppodealAndroid_onRewardedVideoFiledToLoad(JNIEnv *env, jclass jcls) {
-	send_callback("REWARDED_VIDEO_FAILED_TO_LOAD","",0);
+	lua_appodealRewardedFailed();
 }
 
 JNIEXPORT void JNICALL Java_com_appodeal_defold_AppodealAndroid_onRewardedVideoShown(JNIEnv *env, jclass jcls) {
-	send_callback("REWARDED_VIDEO_SHOWN","",0);
+	lua_appodealRewardedShown();
 }
 
 JNIEXPORT void JNICALL Java_com_appodeal_defold_AppodealAndroid_onRewardedVideoClosed(JNIEnv *env, jclass jcls) {
-	send_callback("REWARDED_VIDEO_CLOSED","",0);
+	lua_appodealRewardedClosed();
+	
 }
 
-JNIEXPORT void JNICALL Java_com_appodeal_defold_AppodealAndroid_onRewardedVideoFinished(JNIEnv *env, jclass jcls,  jint amount, jstring name) {
-	const char* rewardName = env->GetStringUTFChars(name, 0);
-	send_callback("REWARDED_VIDEO_FINISHED", (char*)rewardName, (int)amount);
+JNIEXPORT void JNICALL Java_com_appodeal_defold_AppodealAndroid_onRewardedVideoFinished(JNIEnv *env, jclass jcls) {
+	lua_appodealRewardedFinished();
 }
 
 JNIEXPORT void JNICALL Java_com_appodeal_defold_AppodealAndroid_onNonSkippableVideoLoaded(JNIEnv *env, jclass jcls) {
-	send_callback("NON_SKIPPABLE_VIDEO_LOADED","",0);
+	lua_appodealNonSkippableLoaded();
 }
 
 JNIEXPORT void JNICALL Java_com_appodeal_defold_AppodealAndroid_onNonSkippableVideoFiledToLoad(JNIEnv *env, jclass jcls) {
-	send_callback("NON_SKIPPABLE_VIDEO_FAILED_TO_LOAD","",0);
+	lua_appodealNonSkippableFailed();
 }
 
 JNIEXPORT void JNICALL Java_com_appodeal_defold_AppodealAndroid_onNonSkippableVideoShown(JNIEnv *env, jclass jcls) {
-	send_callback("NON_SKIPPABLE_VIDEO_SHOWN","",0);
+	lua_appodealNonSkippableShown();
 }
 
 JNIEXPORT void JNICALL Java_com_appodeal_defold_AppodealAndroid_onNonSkippableVideoClosed(JNIEnv *env, jclass jcls) {
-	send_callback("NON_SKIPPABLE_VIDEO_CLOSED","",0);
+	lua_appodealNonSkippableClosed();
 }
 
 JNIEXPORT void JNICALL Java_com_appodeal_defold_AppodealAndroid_onNonSkippableVideoFinished(JNIEnv *env, jclass jcls) {
-	send_callback("NON_SKIPPABLE_VIDEO_FINISHED","",0);
+	lua_appodealNonSkippableFinished();
 }
-
-void Appodeal_Listen(lua_State* L) {	
-	//creating the callback lua ref 
-	apd = &g_Apd;
-    
-    luaL_checktype(L, 1, LUA_TFUNCTION);
-    lua_pushvalue(L, 1);
-    int cb = dmScript::Ref(L, LUA_REGISTRYINDEX);
-
-    if (apd->listener.m_Callback != LUA_NOREF) {
-      dmScript::Unref(apd->listener.m_L, LUA_REGISTRYINDEX, apd->listener.m_Callback);
-      dmScript::Unref(apd->listener.m_L, LUA_REGISTRYINDEX, apd->listener.m_Self);
-    }
-
-    apd->listener.m_L = dmScript::GetMainThread(L);
-    apd->listener.m_Callback = cb;
-    dmScript::GetInstance(L);
-    apd->listener.m_Self = dmScript::Ref(L, LUA_REGISTRYINDEX);
-}
-
 
 static JNIEnv* Attach() {
 	JNIEnv *env;
@@ -185,8 +122,7 @@ namespace {
 	};
 }
 
-static jclass GetClass(JNIEnv* env, const char* classname)
-{
+static jclass GetClass(JNIEnv* env, const char* classname) {
     jclass activity_class = env->FindClass("android/app/NativeActivity");
     jmethodID get_class_loader = env->GetMethodID(activity_class,"getClassLoader", "()Ljava/lang/ClassLoader;");
     jobject cls = env->CallObjectMethod(dmGraphics::GetNativeAndroidActivity(), get_class_loader);
@@ -247,6 +183,209 @@ bool Appodeal_IsLoaded(lua_State* L) {
     return JNI_TRUE == return_value;
 }
 
+void Appodeal_Hide(lua_State* L) {
+    AttachScope attachscope;
+    JNIEnv* env = attachscope.m_Env;
+    jclass cls = GetClass(env, appodeal_jar_path);
+
+    int adType = luaL_checkint(L, 1);
+    jmethodID method = env->GetStaticMethodID(cls, "Appodeal_Hide", "(Landroid/app/Activity;I)V");
+    env->CallStaticVoidMethod(cls, method, dmGraphics::GetNativeAndroidActivity(), adType);
+}
+
+void Appodeal_Cache(lua_State* L) {
+    AttachScope attachscope;
+    JNIEnv* env = attachscope.m_Env;
+    jclass cls = GetClass(env, appodeal_jar_path);
+
+    int adType = luaL_checkint(L, 1);
+    jmethodID method = env->GetStaticMethodID(cls, "Appodeal_Cache", "(Landroid/app/Activity;I)V");
+    env->CallStaticVoidMethod(cls, method, dmGraphics::GetNativeAndroidActivity(), adType);
+}
+
+void Appodeal_SetAutoCache(lua_State* L) {
+    AttachScope attachscope;
+    JNIEnv* env = attachscope.m_Env;
+    jclass cls = GetClass(env, appodeal_jar_path);
+
+    int adType = luaL_checkint(L, 1);
+    bool flag = get_lua_bool(L, 2);
+    jmethodID method = env->GetStaticMethodID(cls, "Appodeal_SetAutoCache", "(IZ)V");
+    env->CallStaticVoidMethod(cls, method, adType, flag? JNI_TRUE : JNI_FALSE);
+}
+
+bool Appodeal_IsPrecache(lua_State* L) {
+    AttachScope attachscope;
+    JNIEnv* env = attachscope.m_Env;
+    jclass cls = GetClass(env, appodeal_jar_path);
+    
+    int adType = luaL_checkint(L, 1);
+    jmethodID method = env->GetStaticMethodID(cls, "Appodeal_IsPrecache", "(I)Z");
+    jboolean return_value = (jboolean)env->CallStaticBooleanMethod(cls, method, adType);
+    return JNI_TRUE == return_value;
+}
+
+void Appodeal_SetBannerAnimation(lua_State* L) {
+    AttachScope attachscope;
+    JNIEnv* env = attachscope.m_Env;
+    jclass cls = GetClass(env, appodeal_jar_path);
+
+    bool flag = get_lua_bool(L, 1);
+    jmethodID method = env->GetStaticMethodID(cls, "Appodeal_SetBannerAnimation", "(Z)V");
+    env->CallStaticVoidMethod(cls, method, flag? JNI_TRUE : JNI_FALSE);
+}
+
+void Appodeal_SetSmartBanners(lua_State* L) {
+    AttachScope attachscope;
+    JNIEnv* env = attachscope.m_Env;
+    jclass cls = GetClass(env, appodeal_jar_path);
+
+    bool flag = get_lua_bool(L, 1);
+    jmethodID method = env->GetStaticMethodID(cls, "Appodeal_SetSmartBanners", "(Z)V");
+    env->CallStaticVoidMethod(cls, method, flag? JNI_TRUE : JNI_FALSE);
+}
+
+void Appodeal_SetBannerBackground(lua_State* L) {
+    AttachScope attachscope;
+    JNIEnv* env = attachscope.m_Env;
+    jclass cls = GetClass(env, appodeal_jar_path);
+
+    bool flag = get_lua_bool(L, 1);
+    jmethodID method = env->GetStaticMethodID(cls, "Appodeal_SetBannerBackground", "(Z)V");
+    env->CallStaticVoidMethod(cls, method, flag? JNI_TRUE : JNI_FALSE);
+}
+
+void Appodeal_SetTabletBanners(lua_State* L) {
+    AttachScope attachscope;
+    JNIEnv* env = attachscope.m_Env;
+    jclass cls = GetClass(env, appodeal_jar_path);
+
+    bool flag = get_lua_bool(L, 1);
+    jmethodID method = env->GetStaticMethodID(cls, "Appodeal_SetTabletBanners", "(Z)V");
+    env->CallStaticVoidMethod(cls, method, flag? JNI_TRUE : JNI_FALSE);
+}
+
+void Appodeal_SetLogLevel(lua_State* L) {
+    AttachScope attachscope;
+    JNIEnv* env = attachscope.m_Env;
+    jclass cls = GetClass(env, appodeal_jar_path);
+    
+    int logLevel = luaL_checkint(L, 1);
+    jmethodID method = env->GetStaticMethodID(cls, "Appodeal_SetLogLevel", "(I)V");
+    env->CallStaticVoidMethod(cls, method, logLevel);
+}
+
+void Appodeal_SetTesting(lua_State* L) {
+    AttachScope attachscope;
+    JNIEnv* env = attachscope.m_Env;
+    jclass cls = GetClass(env, appodeal_jar_path);
+    
+    bool flag = get_lua_bool(L, 1);
+    jmethodID method = env->GetStaticMethodID(cls, "Appodeal_SetTesting", "(Z)V");
+    env->CallStaticVoidMethod(cls, method, flag? JNI_TRUE : JNI_FALSE);
+}
+
+void Appodeal_SetChildDirectedTreatment(lua_State* L) {
+    AttachScope attachscope;
+    JNIEnv* env = attachscope.m_Env;
+    jclass cls = GetClass(env, appodeal_jar_path);
+    
+    bool flag = get_lua_bool(L, 1);
+    jmethodID method = env->GetStaticMethodID(cls, "Appodeal_SetChildDirectedTreatment", "(Z)V");
+    env->CallStaticVoidMethod(cls, method, flag? JNI_TRUE : JNI_FALSE);
+}
+
+void Appodeal_SetTriggerOnLoadedOnPrecache(lua_State* L) {
+    AttachScope attachscope;
+    JNIEnv* env = attachscope.m_Env;
+    jclass cls = GetClass(env, appodeal_jar_path);
+    
+    int adType = luaL_checkint(L, 1);
+    bool flag = get_lua_bool(L, 2);
+    jmethodID method = env->GetStaticMethodID(cls, "Appodeal_SetTriggerOnLoadedOnPrecache", "(IZ)V");
+    env->CallStaticVoidMethod(cls, method, adType, flag? JNI_TRUE : JNI_FALSE);
+}
+
+void Appodeal_DisableNetwork(lua_State* L) {
+    AttachScope attachscope;
+    JNIEnv* env = attachscope.m_Env;
+    jclass cls = GetClass(env, appodeal_jar_path);
+
+    const char *network = luaL_checkstring(L, 1);
+    jstring jnetwork = env->NewStringUTF(network);
+    jmethodID method = env->GetStaticMethodID(cls, "Appodeal_DisableNetwork", "(Landroid/app/Activity;Ljava/lang/String;)V");
+    env->CallStaticVoidMethod(cls, method, dmGraphics::GetNativeAndroidActivity(), jnetwork);
+}
+
+void Appodeal_DisableNetworkForAdType(lua_State* L) {
+    AttachScope attachscope;
+    JNIEnv* env = attachscope.m_Env;
+    jclass cls = GetClass(env, appodeal_jar_path);
+
+    const char *network = luaL_checkstring(L, 1);
+    int adType = luaL_checkint(L, 2);
+    jstring jnetwork = env->NewStringUTF(network);
+    jmethodID method = env->GetStaticMethodID(cls, "Appodeal_DisableNetworkForAdType", "(Landroid/app/Activity;Ljava/lang/String;I)V");
+    env->CallStaticVoidMethod(cls, method, dmGraphics::GetNativeAndroidActivity(), jnetwork, adType);
+}
+
+void Appodeal_DisableLocationPermissionCheck(lua_State* L) {
+    AttachScope attachscope;
+    JNIEnv* env = attachscope.m_Env;
+    jclass cls = GetClass(env, appodeal_jar_path);
+    
+    jmethodID method = env->GetStaticMethodID(cls, "Appodeal_DisableLocationPermissionCheck", "()V");
+    env->CallStaticVoidMethod(cls, method);
+}
+
+void Appodeal_DisableWriteExternalStoragePermissionCheck(lua_State* L) {
+    AttachScope attachscope;
+    JNIEnv* env = attachscope.m_Env;
+    jclass cls = GetClass(env, appodeal_jar_path);
+    
+    jmethodID method = env->GetStaticMethodID(cls, "Appodeal_DisableWriteExternalStoragePermissionCheck", "()V");
+    env->CallStaticVoidMethod(cls, method);
+}
+
+void Appodeal_RequestAndroidMPermissions(lua_State* L) {
+    AttachScope attachscope;
+    JNIEnv* env = attachscope.m_Env;
+    jclass cls = GetClass(env, appodeal_jar_path);
+    
+    jmethodID method = env->GetStaticMethodID(cls, "Appodeal_RequestAndroidMPermissions", "(Landroid/app/Activity;)V");
+    env->CallStaticVoidMethod(cls, method, dmGraphics::GetNativeAndroidActivity());
+}
+
+void Appodeal_MuteVideosIfCallsMuted(lua_State* L) {
+    AttachScope attachscope;
+    JNIEnv* env = attachscope.m_Env;
+    jclass cls = GetClass(env, appodeal_jar_path);
+    
+    bool flag = get_lua_bool(L, 1);
+    jmethodID method = env->GetStaticMethodID(cls, "Appodeal_MuteVideosIfCallsMuted", "(Z)V");
+    env->CallStaticVoidMethod(cls, method, flag? JNI_TRUE : JNI_FALSE);
+}
+
+void Appodeal_ShowTestScreen(lua_State* L) {
+    AttachScope attachscope;
+    JNIEnv* env = attachscope.m_Env;
+    jclass cls = GetClass(env, appodeal_jar_path);
+    
+    jmethodID method = env->GetStaticMethodID(cls, "Appodeal_ShowTestScreen", "()V");
+    env->CallStaticVoidMethod(cls, method);
+}
+
+char const* Appodeal_GetNativeSDKVersion(lua_State* L) {
+    AttachScope attachscope;
+    JNIEnv* env = attachscope.m_Env;
+    jclass cls = GetClass(env, appodeal_jar_path);
+    jmethodID method = env->GetStaticMethodID(cls, "Appodeal_GetNativeSDKVersion", "()Ljava/lang/String;");
+    jstring return_value = (jstring)env->CallStaticObjectMethod(cls, method);
+    const char* new_char = env->GetStringUTFChars(return_value, 0);
+    env->DeleteLocalRef(return_value);
+    return new_char;
+}
+
 bool Appodeal_CanShow(lua_State* L) {
     AttachScope attachscope;
     JNIEnv* env = attachscope.m_Env;
@@ -271,120 +410,6 @@ bool Appodeal_CanShowWithPlacement(lua_State* L) {
     return JNI_TRUE == return_value;
 }
 
-void Appodeal_Hide(lua_State* L) {
-    AttachScope attachscope;
-    JNIEnv* env = attachscope.m_Env;
-    jclass cls = GetClass(env, appodeal_jar_path);
-
-	int adType = luaL_checkint(L, 1);
-	jmethodID method = env->GetStaticMethodID(cls, "Appodeal_Hide", "(Landroid/app/Activity;I)V");
-    env->CallStaticVoidMethod(cls, method, dmGraphics::GetNativeAndroidActivity(), adType);
-}
-
-void Appodeal_Cache(lua_State* L) {
-    AttachScope attachscope;
-    JNIEnv* env = attachscope.m_Env;
-    jclass cls = GetClass(env, appodeal_jar_path);
-
-	int adType = luaL_checkint(L, 1);
-	jmethodID method = env->GetStaticMethodID(cls, "Appodeal_Cache", "(Landroid/app/Activity;I)V");
-    env->CallStaticVoidMethod(cls, method, dmGraphics::GetNativeAndroidActivity(), adType);
-}
-
-void Appodeal_SetAutoCache(lua_State* L) {
-    AttachScope attachscope;
-    JNIEnv* env = attachscope.m_Env;
-    jclass cls = GetClass(env, appodeal_jar_path);
-
-	bool flag = get_lua_bool(L, 1);
-	int adType = luaL_checkint(L, 2);
-	jmethodID method = env->GetStaticMethodID(cls, "Appodeal_SetAutoCache", "(IZ)V");
-    env->CallStaticVoidMethod(cls, method, adType, flag? JNI_TRUE : JNI_FALSE);
-}
-
-void Appodeal_SetSmartBanners(lua_State* L) {
-    AttachScope attachscope;
-    JNIEnv* env = attachscope.m_Env;
-    jclass cls = GetClass(env, appodeal_jar_path);
-
-	bool flag = get_lua_bool(L, 1);
-    jmethodID method = env->GetStaticMethodID(cls, "Appodeal_SetSmartBanners", "(Z)V");
-    env->CallStaticVoidMethod(cls, method, flag? JNI_TRUE : JNI_FALSE);
-}
-
-void Appodeal_SetBannerAnimation(lua_State* L) {
-    AttachScope attachscope;
-    JNIEnv* env = attachscope.m_Env;
-    jclass cls = GetClass(env, appodeal_jar_path);
-
-	bool flag = get_lua_bool(L, 1);
-    jmethodID method = env->GetStaticMethodID(cls, "Appodeal_SetBannerAnimation", "(Z)V");
-    env->CallStaticVoidMethod(cls, method, flag? JNI_TRUE : JNI_FALSE);
-}
-
-void Appodeal_SetBannerBackground(lua_State* L) {
-    AttachScope attachscope;
-    JNIEnv* env = attachscope.m_Env;
-    jclass cls = GetClass(env, appodeal_jar_path);
-
-	bool flag = get_lua_bool(L, 1);
-    jmethodID method = env->GetStaticMethodID(cls, "Appodeal_SetBannerBackground", "(Z)V");
-    env->CallStaticVoidMethod(cls, method, flag? JNI_TRUE : JNI_FALSE);
-}
-
-void Appodeal_DisableNetwork(lua_State* L) {
-    AttachScope attachscope;
-    JNIEnv* env = attachscope.m_Env;
-    jclass cls = GetClass(env, appodeal_jar_path);
-
-	const char *network = luaL_checkstring(L, 1);
-	jstring jnetwork = env->NewStringUTF(network);
-    jmethodID method = env->GetStaticMethodID(cls, "Appodeal_DisableNewtork", "(Landroid/app/Activity;Ljava/lang/String;)V");
-    env->CallStaticVoidMethod(cls, method, dmGraphics::GetNativeAndroidActivity(), jnetwork);
-}
-
-void Appodeal_DisableNetworkForAdType(lua_State* L) {
-    AttachScope attachscope;
-    JNIEnv* env = attachscope.m_Env;
-    jclass cls = GetClass(env, appodeal_jar_path);
-
-	const char *network = luaL_checkstring(L, 1);
-	int adType = luaL_checkint(L, 2);
-	jstring jnetwork = env->NewStringUTF(network);
-    jmethodID method = env->GetStaticMethodID(cls, "Appodeal_DisableNewtork", "(Landroid/app/Activity;Ljava/lang/String;I)V");
-    env->CallStaticVoidMethod(cls, method, dmGraphics::GetNativeAndroidActivity(), jnetwork, adType);
-}
-
-void Appodeal_MuteVideosIfCallsMuted(lua_State* L) {
-    AttachScope attachscope;
-    JNIEnv* env = attachscope.m_Env;
-    jclass cls = GetClass(env, appodeal_jar_path);
-
-	bool flag = get_lua_bool(L, 1);
-    jmethodID method = env->GetStaticMethodID(cls, "Appodeal_MuteVideosIfCallsMuted", "(Z)V");
-    env->CallStaticVoidMethod(cls, method, flag? JNI_TRUE : JNI_FALSE);
-}
-
-void Appodeal_SetTesting(lua_State* L) {
-    AttachScope attachscope;
-    JNIEnv* env = attachscope.m_Env;
-    jclass cls = GetClass(env, appodeal_jar_path);
-	
-	bool flag = get_lua_bool(L, 1);
-    jmethodID method = env->GetStaticMethodID(cls, "Appodeal_SetTesting", "(Z)V");
-    env->CallStaticVoidMethod(cls, method, flag? JNI_TRUE : JNI_FALSE);
-}
-
-void Appodeal_SetLogging(lua_State* L) {
-    AttachScope attachscope;
-    JNIEnv* env = attachscope.m_Env;
-    jclass cls = GetClass(env, appodeal_jar_path);
-	
-	bool flag = get_lua_bool(L, 1);
-    jmethodID method = env->GetStaticMethodID(cls, "Appodeal_SetLogging", "(Z)V");
-    env->CallStaticVoidMethod(cls, method, flag? JNI_TRUE : JNI_FALSE);
-}
-
 void Appodeal_SetCustomIntRule(lua_State* L) {
     AttachScope attachscope;
     JNIEnv* env = attachscope.m_Env;
@@ -405,7 +430,7 @@ void Appodeal_SetCustomBoolRule(lua_State* L) {
 	bool lua_rule = get_lua_bool(L, 2);
 	const char *rule_name_lua = luaL_checkstring(L, 1);
 	jstring jname = env->NewStringUTF(rule_name_lua);
-	jmethodID method = env->GetStaticMethodID(cls, "Appodeal_SetCustomBoolRule", "(Ljava/lang/String;I)V");
+	jmethodID method = env->GetStaticMethodID(cls, "Appodeal_SetCustomBoolRule", "(Ljava/lang/String;Z)V");
     env->CallStaticVoidMethod(cls, method, jname, lua_rule? JNI_TRUE : JNI_FALSE);
 }
 
@@ -415,9 +440,9 @@ void Appodeal_SetCustomDoubleRule(lua_State* L) {
     jclass cls = GetClass(env, appodeal_jar_path);
 
 	const char *rule_name_lua = luaL_checkstring(L, 1);
-	double rule_double = luaL_checknumber(L, 2);
+	float rule_double = luaL_checknumber(L, 2);
 	jstring jname = env->NewStringUTF(rule_name_lua);
-	jmethodID method = env->GetStaticMethodID(cls, "Appodeal_SetCustomDoubleRule", "(Ljava/lang/String;D)V");
+	jmethodID method = env->GetStaticMethodID(cls, "Appodeal_SetCustomDoubleRule", "(Ljava/lang/String;F)V");
     env->CallStaticVoidMethod(cls, method, jname, rule_double);
 }
 
@@ -434,15 +459,62 @@ void Appodeal_SetCustomStringRule(lua_State* L) {
     env->CallStaticVoidMethod(cls, method, jname, jvalue);
 }
 
-char const* Appodeal_GetNativeSDKVersion(lua_State* L) {
+void Appodeal_TrackInAppPurchase(lua_State* L) {
     AttachScope attachscope;
     JNIEnv* env = attachscope.m_Env;
     jclass cls = GetClass(env, appodeal_jar_path);
-    jmethodID method = env->GetStaticMethodID(cls, "Appodeal_GetNativeSDKVersion", "()Ljava/lang/String;");
+
+    int amount = luaL_checkint(L, 1);
+    const char *name_lua = luaL_checkstring(L, 2);
+    jstring jname = env->NewStringUTF(name_lua);
+    jmethodID method = env->GetStaticMethodID(cls, "Appodeal_TrackInAppPurchase", "(Landroid/app/Activity;ILjava/lang/String;)V");
+    env->CallStaticVoidMethod(cls, method, dmGraphics::GetNativeAndroidActivity(), amount, jname);
+}
+
+char const* Appodeal_GetRewardName(lua_State* L) {
+    AttachScope attachscope;
+    JNIEnv* env = attachscope.m_Env;
+    jclass cls = GetClass(env, appodeal_jar_path);
+    jmethodID method = env->GetStaticMethodID(cls, "Appodeal_GetRewardName", "()Ljava/lang/String;");
     jstring return_value = (jstring)env->CallStaticObjectMethod(cls, method);
     const char* new_char = env->GetStringUTFChars(return_value, 0);
     env->DeleteLocalRef(return_value);
     return new_char;
+}
+
+int Appodeal_GetRewardAmount(lua_State* L) {
+    AttachScope attachscope;
+    JNIEnv* env = attachscope.m_Env;
+    jclass cls = GetClass(env, appodeal_jar_path);
+    jmethodID method = env->GetStaticMethodID(cls, "Appodeal_GetRewardAmount", "()I");
+    jint val = env->CallIntMethod(cls, method);
+    return val;
+}
+
+char const* Appodeal_GetRewardNameForPlacement(lua_State* L) {
+    AttachScope attachscope;
+    JNIEnv* env = attachscope.m_Env;
+    jclass cls = GetClass(env, appodeal_jar_path);
+
+    const char *placement = luaL_checkstring(L, 1);
+    jstring jplacement = env->NewStringUTF(placement);
+    jmethodID method = env->GetStaticMethodID(cls, "Appodeal_GetRewardNameForPlacement", "(Ljava/lang/String;)Ljava/lang/String;");
+    jstring return_value = (jstring)env->CallStaticObjectMethod(cls, method, jplacement);
+    const char* new_char = env->GetStringUTFChars(return_value, 0);
+    env->DeleteLocalRef(return_value);
+    return new_char;
+}
+
+int Appodeal_GetRewardAmountForPlacement(lua_State* L) {
+    AttachScope attachscope;
+    JNIEnv* env = attachscope.m_Env;
+    jclass cls = GetClass(env, appodeal_jar_path);
+
+    const char *placement = luaL_checkstring(L, 1);
+    jstring jplacement = env->NewStringUTF(placement);
+    jmethodID method = env->GetStaticMethodID(cls, "Appodeal_GetRewardAmountForPlacement", "(Ljava/lang/String;)I");
+    jint val = env->CallIntMethod(cls, method, jplacement);
+    return val;
 }
 
 void Appodeal_SetUserAge(lua_State* L) {

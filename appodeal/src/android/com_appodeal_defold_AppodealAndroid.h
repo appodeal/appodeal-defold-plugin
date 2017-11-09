@@ -48,7 +48,7 @@ JNIEXPORT void JNICALL Java_com_appodeal_defold_AppodealAndroid_onRewardedVideoC
   (JNIEnv *, jclass);
 
 JNIEXPORT void JNICALL Java_com_appodeal_defold_AppodealAndroid_onRewardedVideoFinished
-  (JNIEnv *, jclass, jint, jstring);
+  (JNIEnv *, jclass);
 
 JNIEXPORT void JNICALL Java_com_appodeal_defold_AppodealAndroid_onNonSkippableVideoLoaded
   (JNIEnv *, jclass);

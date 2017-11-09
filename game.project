@@ -1,0 +1,32 @@
+[project]
+title = Appodeal Demo
+version = 0.1
+dependencies = https://github.com/andsve/dirtylarry/archive/master.zip
+write_log = 1
+
+[bootstrap]
+main_collection = /main/main.collectionc
+
+[input]
+game_binding = /input/game.input_bindingc
+use_accelerometer = 0
+
+[display]
+width = 1280
+height = 720
+
+[physics]
+scale = 0.02
+
+[ios]
+bundle_identifier = com.appodeal.testing
+
+[script]
+shared_state = 1
+
+[android]
+package = com.appodeal.test
+manifest = /appodeal/AndroidManifest.xml
+
+[native_extension]
+app_manifest = game.appmanifest
