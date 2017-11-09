@@ -17,28 +17,28 @@ void finalize() {
 }
 
 void set_callback(lua_State* L, int pos) {
-  	defAtoLua = &g_DefAppodealAds;
-  	luaL_checktype(L, pos, LUA_TFUNCTION);
-  	lua_pushvalue(L, pos);
-  	int cb = dmScript::Ref(L, LUA_REGISTRYINDEX);
-  
-  	if (defAtoLua->listener.m_Callback != LUA_NOREF) {
-      	dmScript::Unref(defAtoLua->listener.m_L, LUA_REGISTRYINDEX, defAtoLua->listener.m_Callback);
-      	dmScript::Unref(defAtoLua->listener.m_L, LUA_REGISTRYINDEX, defAtoLua->listener.m_Self);
- 	}
-  
-  	defAtoLua->listener.m_L = dmScript::GetMainThread(L);
-  	defAtoLua->listener.m_Callback = cb;
-  	dmScript::GetInstance(L);
-  	defAtoLua->listener.m_Self = dmScript::Ref(L, LUA_REGISTRYINDEX);
+    defAtoLua = &g_DefAppodealAds;
+    luaL_checktype(L, pos, LUA_TFUNCTION);
+    lua_pushvalue(L, pos);
+    int cb = dmScript::Ref(L, LUA_REGISTRYINDEX);
+    
+    if (defAtoLua->listener.m_Callback != LUA_NOREF) {
+        dmScript::Unref(defAtoLua->listener.m_L, LUA_REGISTRYINDEX, defAtoLua->listener.m_Callback);
+        dmScript::Unref(defAtoLua->listener.m_L, LUA_REGISTRYINDEX, defAtoLua->listener.m_Self);
+    }
+    
+    defAtoLua->listener.m_L = dmScript::GetMainThread(L);
+    defAtoLua->listener.m_Callback = cb;
+    dmScript::GetInstance(L);
+    defAtoLua->listener.m_Self = dmScript::Ref(L, LUA_REGISTRYINDEX);
 }
 
 void send_callback(int type) {
     lua_State* L = defAtoLua->listener.m_L;
     int top = lua_gettop(L);
     lua_rawgeti(L, LUA_REGISTRYINDEX, defAtoLua->listener.m_Callback);
-   	lua_rawgeti(L, LUA_REGISTRYINDEX, defAtoLua->listener.m_Self);
-   	lua_pushvalue(L, -1);
+    lua_rawgeti(L, LUA_REGISTRYINDEX, defAtoLua->listener.m_Self);
+    lua_pushvalue(L, -1);
     dmScript::SetInstance(L);
     lua_pushnumber(L, type);
     
@@ -51,73 +51,73 @@ void send_callback(int type) {
 }
 
 void add_to_queue(int type) {
-  	CallbackData data;
-  	data.msg_type = type;
-  	if(m_callbacksQueue.Full()) {
-      	m_callbacksQueue.OffsetCapacity(32);
-  	}
-  	m_callbacksQueue.Push(data);
+    CallbackData data;
+    data.msg_type = type;
+    if(m_callbacksQueue.Full()) {
+        m_callbacksQueue.OffsetCapacity(32);
+    }
+    m_callbacksQueue.Push(data);
 }
 
 void lua_appodealBannerLoaded() {
-  	add_to_queue((int)BANNER_LOADED);
+    add_to_queue((int)BANNER_LOADED);
 }
 void lua_appodealBannerFailed() {
-  	add_to_queue((int)BANNER_FAILED_TO_LOAD, NULL, 0, NULL, 0);
+    add_to_queue((int)BANNER_FAILED_TO_LOAD);
 }
 void lua_appodealBannerShown() {
-  	add_to_queue((int)BANNER_SHOWN, NULL, 0, NULL, 0);
+    add_to_queue((int)BANNER_SHOWN);
 }
 void lua_appodealBannerClicked() {
-  	add_to_queue((int)BANNER_CLICKED, NULL, 0, NULL, 0);
+    add_to_queue((int)BANNER_CLICKED);
 }
 
 void lua_appodealInterstitialLoaded() {
-  	add_to_queue((int)INTERSTITIAL_LOADED, NULL, 0, NULL, 0);
+    add_to_queue((int)INTERSTITIAL_LOADED);
 }
 void lua_appodealInterstitialFailed() {
-  	add_to_queue((int)INTERSTITIAL_FAILED_TO_LOAD, NULL, 0, NULL, 0);
+    add_to_queue((int)INTERSTITIAL_FAILED_TO_LOAD);
 }
 void lua_appodealInterstitialShown() {
-  	add_to_queue((int)INTERSTITIAL_SHOWN, NULL, 0, NULL, 0);
+    add_to_queue((int)INTERSTITIAL_SHOWN);
 }
 void lua_appodealInterstitialClosed() {
-  	add_to_queue((int)INTERSTITIAL_CLOSED, NULL, 0, NULL, 0);
+    add_to_queue((int)INTERSTITIAL_CLOSED);
 }
 void lua_appodealInterstitialClicked() {
-  	add_to_queue((int)INTERSTITIAL_CLICKED, NULL, 0, NULL, 0);
+    add_to_queue((int)INTERSTITIAL_CLICKED);
 }
 
 void lua_appodealRewardedLoaded() {
- 	add_to_queue((int)REWARDED_VIDEO_LOADED, NULL, 0, NULL, 0);
+    add_to_queue((int)REWARDED_VIDEO_LOADED);
 }
 void lua_appodealRewardedFailed() {
-	add_to_queue((int)REWARDED_VIDEO_FAILED_TO_LOAD, NULL, 0, NULL, 0);
+    add_to_queue((int)REWARDED_VIDEO_FAILED_TO_LOAD);
 }
 void lua_appodealRewardedClosed() {
-  	add_to_queue((int)REWARDED_VIDEO_CLOSED, NULL, 0, NULL, 0);
+    add_to_queue((int)REWARDED_VIDEO_CLOSED);
 }
 void lua_appodealRewardedFinished() {
-  	add_to_queue((int)REWARDED_VIDEO_FISNIHED, (char*)"name", name, (char*)"amount", amount);
+    add_to_queue((int)REWARDED_VIDEO_FISNIHED);
 }
 void lua_appodealRewardedShown() {
-  	add_to_queue((int)REWARDED_VIDEO_SHOWN, NULL, 0, NULL, 0);
+    add_to_queue((int)REWARDED_VIDEO_SHOWN);
 }
 
 void lua_appodealNonSkippableLoaded() {
-  	add_to_queue((int)NON_SKIPPABLE_VIDEO_LOADED, NULL, 0, NULL, 0);
+    add_to_queue((int)NON_SKIPPABLE_VIDEO_LOADED);
 }
 void lua_appodealNonSkippableFailed() {
-  	add_to_queue((int)NON_SKIPPABLE_VIDEO_FAILED_TO_LOAD, NULL, 0, NULL, 0);
+    add_to_queue((int)NON_SKIPPABLE_VIDEO_FAILED_TO_LOAD);
 }
 void lua_appodealNonSkippableClosed() {
-  	add_to_queue((int)NON_SKIPPABLE_VIDEO_CLOSED, NULL, 0, NULL, 0);
+    add_to_queue((int)NON_SKIPPABLE_VIDEO_CLOSED);
 }
 void lua_appodealNonSkippableFinished() {
-  	add_to_queue((int)NON_SKIPPABLE_VIDEO_FISNIHED, NULL, 0, NULL, 0);
+    add_to_queue((int)NON_SKIPPABLE_VIDEO_FISNIHED);
 }
 void lua_appodealNonSkippableShown() {
-  	add_to_queue((int)NON_SKIPPABLE_VIDEO_SHOWN, NULL, 0, NULL, 0);
+    add_to_queue((int)NON_SKIPPABLE_VIDEO_SHOWN);
 }
 
 void callback_updates() {
@@ -139,14 +139,14 @@ bool luaL_checkbool(lua_State *L, int numArg) {
 }
 
 void luaL_push_pair_str_num(lua_State *L, char *key, int value) {
-   lua_pushstring(L, key);
-   lua_pushnumber(L, value);
-   lua_settable(L, -3);
+    lua_pushstring(L, key);
+    lua_pushnumber(L, value);
+    lua_settable(L, -3);
 }
 
 void luaL_push_pair_str_str(lua_State *L, char *key, char *value) {
-   lua_pushstring(L, key);
-   lua_pushstring(L, value);
-   lua_settable(L, -3);
+    lua_pushstring(L, key);
+    lua_pushstring(L, value);
+    lua_settable(L, -3);
 }
 #endif
