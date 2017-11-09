@@ -80,11 +80,11 @@ function on_input(self, action_id, action)
 		appodeal.setUserAge(26)
 		appodeal.setUserGender(appodeal.GENDER_MALE)
 		appodeal.setAutoCache(appodeal.INTERSTITIAL, false)
-		--appodeal.setCallback(appodeal_ads_callback)
+		appodeal.setCallback(appodeal_ads_callback)
 		if sys.get_sys_info().system_name == "Android" then
-			appodeal.initialize("fee50c333ff3825fd6ad6d38cff78154de3025546d47a84f", self.radio_value, appodeal_ads_callback)
+			appodeal.initialize("fee50c333ff3825fd6ad6d38cff78154de3025546d47a84f", self.radio_value)
 		elseif sys.get_sys_info().system_name == "iPhone OS" then
-			appodeal.initialize("4b46ef930cd37cf11da84ae4d41019abb7234d5bbce3f000", self.radio_value, appodeal_ads_callback)
+			appodeal.initialize("4b46ef930cd37cf11da84ae4d41019abb7234d5bbce3f000", self.radio_value)
 		end
     end)
     
