@@ -1,6 +1,6 @@
 #if defined(DM_PLATFORM_ANDROID)
 
-#include "../appodeal_callback.h"
+#include "../appodeal.h"
 #include "com_appodeal_defold_AppodealAndroid.h"
 
 #include <dmsdk/sdk.h>
@@ -9,6 +9,8 @@
 #include <dmsdk/dlib/log.h>
 
 const char* appodeal_jar_path = "com/appodeal/defold/AppodealAndroid";
+
+static AppodealListener *g_appodealListener;
 
 bool get_lua_bool (lua_State* L, int index) {
 	if (lua_isboolean(L, index))
@@ -21,80 +23,98 @@ bool get_lua_bool (lua_State* L, int index) {
 }
 
 JNIEXPORT void JNICALL Java_com_appodeal_defold_AppodealAndroid_onBannerLoaded(JNIEnv *env, jclass jcls) {
-	lua_appodealBannerLoaded();
+	if (g_appodealListener)
+        g_appodealListener->callWithNoParam((int)BANNER_LOADED);
 }
 
 JNIEXPORT void JNICALL Java_com_appodeal_defold_AppodealAndroid_onBannerFailedToLoad(JNIEnv *env, jclass jcls) {
-	lua_appodealBannerFailed();
+	if (g_appodealListener)
+        g_appodealListener->callWithNoParam((int)BANNER_FAILED_TO_LOAD);
 }
 
 JNIEXPORT void JNICALL Java_com_appodeal_defold_AppodealAndroid_onBannerShown(JNIEnv *env, jclass jcls) {
-	lua_appodealBannerShown();
+	if (g_appodealListener)
+        g_appodealListener->callWithNoParam((int)BANNER_SHOWN);
 }
 
 JNIEXPORT void JNICALL Java_com_appodeal_defold_AppodealAndroid_onBannerClicked(JNIEnv *env, jclass jcls) {
-	lua_appodealBannerClicked();
+	if (g_appodealListener)
+        g_appodealListener->callWithNoParam((int)BANNER_CLICKED);
 }
 
 JNIEXPORT void JNICALL Java_com_appodeal_defold_AppodealAndroid_onInterstitialLoaded(JNIEnv *env, jclass jcls) {
-	lua_appodealInterstitialLoaded();
+	if (g_appodealListener)
+        g_appodealListener->callWithNoParam((int)INTERSTITIAL_LOADED);
 }
 
 JNIEXPORT void JNICALL Java_com_appodeal_defold_AppodealAndroid_onInterstitialFiledToLoad(JNIEnv *env, jclass jcls) {
-	lua_appodealInterstitialFailed();
+	if (g_appodealListener)
+        g_appodealListener->callWithNoParam((int)INTERSTITIAL_FAILED_TO_LOAD);
 }
 
 JNIEXPORT void JNICALL Java_com_appodeal_defold_AppodealAndroid_onInterstitialShown(JNIEnv *env, jclass jcls) {
-	lua_appodealInterstitialShown();
+	if (g_appodealListener)
+        g_appodealListener->callWithNoParam((int)INTERSTITIAL_SHOWN);
 }
 
 JNIEXPORT void JNICALL Java_com_appodeal_defold_AppodealAndroid_onInterstitialClicked(JNIEnv *env, jclass jcls) {
-	lua_appodealInterstitialClosed();
+	if (g_appodealListener)
+        g_appodealListener->callWithNoParam((int)INTERSTITIAL_CLICKED);
 }
 
 JNIEXPORT void JNICALL Java_com_appodeal_defold_AppodealAndroid_onInterstitialClosed(JNIEnv *env, jclass jcls) {
-	lua_appodealInterstitialClicked();
+	if (g_appodealListener)
+        g_appodealListener->callWithNoParam((int)INTERSTITIAL_CLOSED);
 }
 
 JNIEXPORT void JNICALL Java_com_appodeal_defold_AppodealAndroid_onRewardedVideoLoaded(JNIEnv *env, jclass jcls) {
-	lua_appodealRewardedLoaded();
+	if (g_appodealListener)
+        g_appodealListener->callWithNoParam((int)REWARDED_VIDEO_LOADED);
 }
 
 JNIEXPORT void JNICALL Java_com_appodeal_defold_AppodealAndroid_onRewardedVideoFiledToLoad(JNIEnv *env, jclass jcls) {
-	lua_appodealRewardedFailed();
+	if (g_appodealListener)
+        g_appodealListener->callWithNoParam((int)REWARDED_VIDEO_FAILED_TO_LOAD);
 }
 
 JNIEXPORT void JNICALL Java_com_appodeal_defold_AppodealAndroid_onRewardedVideoShown(JNIEnv *env, jclass jcls) {
-	lua_appodealRewardedShown();
+	if (g_appodealListener)
+        g_appodealListener->callWithNoParam((int)REWARDED_VIDEO_SHOWN);
 }
 
 JNIEXPORT void JNICALL Java_com_appodeal_defold_AppodealAndroid_onRewardedVideoClosed(JNIEnv *env, jclass jcls) {
-	lua_appodealRewardedClosed();
-	
+	if (g_appodealListener)
+        g_appodealListener->callWithNoParam((int)REWARDED_VIDEO_CLOSED);
 }
 
 JNIEXPORT void JNICALL Java_com_appodeal_defold_AppodealAndroid_onRewardedVideoFinished(JNIEnv *env, jclass jcls) {
-	lua_appodealRewardedFinished();
+	if (g_appodealListener)
+        g_appodealListener->callWithNoParam((int)REWARDED_VIDEO_FISNIHED);
 }
 
 JNIEXPORT void JNICALL Java_com_appodeal_defold_AppodealAndroid_onNonSkippableVideoLoaded(JNIEnv *env, jclass jcls) {
-	lua_appodealNonSkippableLoaded();
+	if (g_appodealListener)
+        g_appodealListener->callWithNoParam((int)NON_SKIPPABLE_VIDEO_LOADED);
 }
 
 JNIEXPORT void JNICALL Java_com_appodeal_defold_AppodealAndroid_onNonSkippableVideoFiledToLoad(JNIEnv *env, jclass jcls) {
-	lua_appodealNonSkippableFailed();
+	if (g_appodealListener)
+        g_appodealListener->callWithNoParam((int)NON_SKIPPABLE_VIDEO_FAILED_TO_LOAD);
 }
 
 JNIEXPORT void JNICALL Java_com_appodeal_defold_AppodealAndroid_onNonSkippableVideoShown(JNIEnv *env, jclass jcls) {
-	lua_appodealNonSkippableShown();
+    if (g_appodealListener)
+        g_appodealListener->callWithNoParam((int)NON_SKIPPABLE_VIDEO_SHOWN);
 }
 
 JNIEXPORT void JNICALL Java_com_appodeal_defold_AppodealAndroid_onNonSkippableVideoClosed(JNIEnv *env, jclass jcls) {
-	lua_appodealNonSkippableClosed();
+	if (g_appodealListener)
+        g_appodealListener->callWithNoParam((int)NON_SKIPPABLE_VIDEO_CLOSED);
 }
 
 JNIEXPORT void JNICALL Java_com_appodeal_defold_AppodealAndroid_onNonSkippableVideoFinished(JNIEnv *env, jclass jcls) {
-	lua_appodealNonSkippableFinished();
+    if (g_appodealListener)
+        g_appodealListener->callWithNoParam((int)NON_SKIPPABLE_VIDEO_FISNIHED);
 }
 
 static JNIEnv* Attach() {
@@ -133,6 +153,10 @@ static jclass GetClass(JNIEnv* env, const char* classname) {
     jclass outcls = (jclass)env->CallObjectMethod(cls, find_class, str_class_name);
     env->DeleteLocalRef(str_class_name);
     return outcls;
+}
+
+void Appodeal_SetCallback(AppodealListener *appodealListener) {
+   g_appodealListener = appodealListener;
 }
 
 void Appodeal_Initialize(lua_State* L) {

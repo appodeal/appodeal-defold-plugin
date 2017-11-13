@@ -1,12 +1,13 @@
 #if defined(DM_PLATFORM_IOS)
 
-#include "appodeal_ios.h"
-#include "../appodeal_callback.h"
+#include "../appodeal.h"
 
 #include <AVFoundation/AVFoundation.h>
 #include <UIKit/UIKit.h>
 
 #import <Appodeal/Appodeal.h>
+
+static AppodealListener *g_appodealListener;
 
 @interface AppodealAdsDelegate : NSObject <AppodealBannerDelegate, AppodealInterstitialDelegate, AppodealRewardedVideoDelegate, AppodealNonSkippableVideoDelegate>
 @end
@@ -17,31 +18,88 @@
 @implementation AppodealAdsDelegate
 
 //banner callbacks
-- (void)bannerDidLoadAdIsPrecache:(BOOL)precache { lua_appodealBannerLoaded(); }
-- (void)bannerDidFailToLoadAd { lua_appodealBannerFailed(); }
-- (void)bannerDidClick { lua_appodealBannerClicked(); }
-- (void)bannerDidShow {	lua_appodealBannerShown(); }
+- (void)bannerDidLoadAdIsPrecache:(BOOL)precache { 
+	if (g_appodealListener)
+        g_appodealListener->callWithNoParam((int)BANNER_LOADED); 
+}
+- (void)bannerDidFailToLoadAd { 
+	if (g_appodealListener)
+        g_appodealListener->callWithNoParam((int)BANNER_FAILED_TO_LOAD);
+}
+- (void)bannerDidClick { 
+	if (g_appodealListener)
+        g_appodealListener->callWithNoParam((int)BANNER_CLICKED);
+}
+- (void)bannerDidShow {	
+	if (g_appodealListener)
+        g_appodealListener->callWithNoParam((int)BANNER_SHOWN);
+}
 
 //interstitial callbacks
-- (void)interstitialDidLoadAdisPrecache:(BOOL)precache { lua_appodealInterstitialLoaded(); }
-- (void)interstitialDidFailToLoadAd { lua_appodealInterstitialFailed(); }
-- (void)interstitialWillPresent { lua_appodealInterstitialShown(); }
-- (void)interstitialDidDismiss { lua_appodealInterstitialClosed(); }
-- (void)interstitialDidClick { lua_appodealInterstitialClicked(); }
+- (void)interstitialDidLoadAdisPrecache:(BOOL)precache { 
+	if (g_appodealListener)
+        g_appodealListener->callWithNoParam((int)INTERSTITIAL_LOADED);
+}
+- (void)interstitialDidFailToLoadAd { 
+    if (g_appodealListener)
+        g_appodealListener->callWithNoParam((int)INTERSTITIAL_FAILED_TO_LOAD);
+}
+- (void)interstitialWillPresent { 
+    if (g_appodealListener)
+        g_appodealListener->callWithNoParam((int)INTERSTITIAL_SHOWN);
+}
+- (void)interstitialDidDismiss { 
+    if (g_appodealListener)
+        g_appodealListener->callWithNoParam((int)INTERSTITIAL_CLOSED);
+}
+- (void)interstitialDidClick { 
+    if (g_appodealListener)
+        g_appodealListener->callWithNoParam((int)INTERSTITIAL_CLICKED);
+}
 
 //rewarded video callbacks
-- (void)rewardedVideoDidLoadAd { lua_appodealRewardedLoaded(); }
-- (void)rewardedVideoDidFailToLoadAd { lua_appodealRewardedFailed(); }
-- (void)rewardedVideoDidPresent { lua_appodealRewardedShown(); }
-- (void)rewardedVideoWillDismiss { lua_appodealRewardedClosed(); }
-- (void)rewardedVideoDidFinish:(NSUInteger)rewardAmount name:(NSString *)rewardName { lua_appodealRewardedFinished((int)rewardAmount, (char*)[rewardName UTF8String]); }
+- (void)rewardedVideoDidLoadAd {
+	if (g_appodealListener)
+        g_appodealListener->callWithNoParam((int)REWARDED_VIDEO_LOADED);
+}
+- (void)rewardedVideoDidFailToLoadAd {
+    if (g_appodealListener)
+        g_appodealListener->callWithNoParam((int)REWARDED_VIDEO_FAILED_TO_LOAD);
+}
+- (void)rewardedVideoDidPresent {
+    if (g_appodealListener)
+        g_appodealListener->callWithNoParam((int)REWARDED_VIDEO_SHOWN);
+}
+- (void)rewardedVideoWillDismiss {
+    if (g_appodealListener)
+        g_appodealListener->callWithNoParam((int)REWARDED_VIDEO_CLOSED);
+}
+- (void)rewardedVideoDidFinish:(NSUInteger)rewardAmount name:(NSString *)rewardName {
+    if (g_appodealListener)
+        g_appodealListener->callWithNoParam((int)REWARDED_VIDEO_FISNIHED);
+}
 
 //non skippable video callbacks
-- (void)nonSkippableVideoDidLoadAd { lua_appodealNonSkippableLoaded(); }
-- (void)nonSkippableVideoDidFailToLoadAd { lua_appodealNonSkippableFailed(); }
-- (void)nonSkippableVideoDidPresent { lua_appodealNonSkippableShown(); }
-- (void)nonSkippableVideoWillDismiss { lua_appodealNonSkippableClosed(); }
-- (void)nonSkippableVideoDidFinish { lua_appodealNonSkippableFinished(); }
+- (void)nonSkippableVideoDidLoadAd {
+    if (g_appodealListener)
+        g_appodealListener->callWithNoParam((int)NON_SKIPPABLE_VIDEO_LOADED);
+}
+- (void)nonSkippableVideoDidFailToLoadAd {
+    if (g_appodealListener)
+        g_appodealListener->callWithNoParam((int)NON_SKIPPABLE_VIDEO_FAILED_TO_LOAD);
+}
+- (void)nonSkippableVideoDidPresent {
+    if (g_appodealListener)
+        g_appodealListener->callWithNoParam((int)NON_SKIPPABLE_VIDEO_SHOWN);
+}
+- (void)nonSkippableVideoWillDismiss {
+    if (g_appodealListener)
+        g_appodealListener->callWithNoParam((int)NON_SKIPPABLE_VIDEO_CLOSED);
+}
+- (void)nonSkippableVideoDidFinish {
+    if (g_appodealListener)
+        g_appodealListener->callWithNoParam((int)NON_SKIPPABLE_VIDEO_FISNIHED);
+}
 
 @end
 
@@ -117,6 +175,10 @@ void Appodeal_Initialize(lua_State* L) {
 
 	UIWindow* window = dmGraphics::GetNativeiOSUIWindow();
 	uiViewController = window.rootViewController;
+}
+
+void Appodeal_SetCallback(AppodealListener *appodealListener) {
+   g_appodealListener = appodealListener;
 }
 
 bool Appodeal_Show(lua_State* L) {

@@ -6,7 +6,7 @@
 #include <dmsdk/sdk.h>
 
 #if defined(DM_PLATFORM_IOS) || defined(DM_PLATFORM_ANDROID)
-#include "appodeal_callback.h"
+#include "appodeal.h"
 
 #if defined(DM_PLATFORM_IOS)
 #include "ios/appodeal_ios.h"
@@ -14,8 +14,11 @@
 #include "android/appodeal_android.h"
 #endif
 
+AppodealListener g_appodealListener;
+
 static int setCallback(lua_State* L) {
-    set_callback(L, 1);
+    g_appodealListener.set(L, 1);
+    Appodeal_SetCallback(&g_appodealListener);
     return 0;
 }
 
@@ -38,7 +41,7 @@ static int show(lua_State* L) {
 }
 
 static int showWithPlacement(lua_State* L) {
-	bool status = Appodeal_ShowWithPlacement(L);
+	  bool status = Appodeal_ShowWithPlacement(L);
     lua_pushboolean(L, status);
     return 1;
 }
@@ -235,47 +238,47 @@ static int setUserGender(lua_State* L) {
 }
 
 static const luaL_reg Module_methods[] = {
-  {"setCallback", setCallback},
-  {"isSupported", isSupported},
-  {"initialize", initialize},
-  {"show", show},
-  {"showWithPlacement", showWithPlacement},
-  {"isLoaded", isLoaded},
-  {"cache", cache},
-  {"hide", hide},
-  {"setAutoCache", setAutoCache},
-  {"isPrecache", isPrecache},
-  {"setSmartBanners", setSmartBanners},
-  {"setBannerBackground", setBannerBackground},
-  {"setBannerAnimation", setBannerAnimation},
-  {"setTabletBanners", setTabletBanners},
-  {"setLogLevel", setLogLevel},
-  {"setTesting", setTesting},
-  {"setChildDirectedTreatment", setChildDirectedTreatment},
-  {"setTriggerOnLoadedOnPrecache", setTriggerOnLoadedOnPrecache},
-  {"disableNetwork", disableNetwork},
-  {"disableNetworkForAdType", disableNetworkForAdType},
-  {"disableLocationPermissionCheck", disableLocationPermissionCheck},
-  {"disableWriteExternalStoragePermissionCheck", disableWriteExternalStoragePermissionCheck},
-  {"requestAndroidMPermissions", requestAndroidMPermissions},
-  {"muteVideosIfCallsMuted", muteVideosIfCallsMuted},
-  {"showTestScreen", showTestScreen},
-  {"getNativeSDKVersion", getNativeSDKVersion},
-  {"canShow", canShow},
-  {"canShowWithPlacement", canShowWithPlacement},
-  {"setCustomIntRule", setCustomIntRule},
-  {"setCustomBoolRule", setCustomBoolRule},
-  {"setCustomDoubleRule", setCustomDoubleRule},
-  {"setCustomStringRule", setCustomStringRule},
-  {"trackInAppPurchase", trackInAppPurchase},
-  {"getRewardName", getRewardName},
-  {"getRewardAmount", getRewardAmount},
-  {"getRewardNameForPlacement", getRewardNameForPlacement},
-  {"getRewardAmountForPlacement", getRewardAmountForPlacement},
-  {"setUserId", setUserId},
-  {"setUserAge", setUserAge},
-  {"setUserGender", setUserGender},
-  {0, 0}
+    {"setCallback", setCallback},
+    {"isSupported", isSupported},
+    {"initialize", initialize},
+    {"show", show},
+    {"showWithPlacement", showWithPlacement},
+    {"isLoaded", isLoaded},
+    {"cache", cache},
+    {"hide", hide},
+    {"setAutoCache", setAutoCache},
+    {"isPrecache", isPrecache},
+    {"setSmartBanners", setSmartBanners},
+    {"setBannerBackground", setBannerBackground},
+    {"setBannerAnimation", setBannerAnimation},
+    {"setTabletBanners", setTabletBanners},
+    {"setLogLevel", setLogLevel},
+    {"setTesting", setTesting},
+    {"setChildDirectedTreatment", setChildDirectedTreatment},
+    {"setTriggerOnLoadedOnPrecache", setTriggerOnLoadedOnPrecache},
+    {"disableNetwork", disableNetwork},
+    {"disableNetworkForAdType", disableNetworkForAdType},
+    {"disableLocationPermissionCheck", disableLocationPermissionCheck},
+    {"disableWriteExternalStoragePermissionCheck", disableWriteExternalStoragePermissionCheck},
+    {"requestAndroidMPermissions", requestAndroidMPermissions},
+    {"muteVideosIfCallsMuted", muteVideosIfCallsMuted},
+    {"showTestScreen", showTestScreen},
+    {"getNativeSDKVersion", getNativeSDKVersion},
+    {"canShow", canShow},
+    {"canShowWithPlacement", canShowWithPlacement},
+    {"setCustomIntRule", setCustomIntRule},
+    {"setCustomBoolRule", setCustomBoolRule},
+    {"setCustomDoubleRule", setCustomDoubleRule},
+    {"setCustomStringRule", setCustomStringRule},
+    {"trackInAppPurchase", trackInAppPurchase},
+    {"getRewardName", getRewardName},
+    {"getRewardAmount", getRewardAmount},
+    {"getRewardNameForPlacement", getRewardNameForPlacement},
+    {"getRewardAmountForPlacement", getRewardAmountForPlacement},
+    {"setUserId", setUserId},
+    {"setUserAge", setUserAge},
+    {"setUserGender", setUserGender},
+    {0, 0}
 };
 
 static void LuaInit(lua_State* L) {
@@ -344,12 +347,10 @@ dmExtension::Result AppFinalizeAppodeal(dmExtension::AppParams* params) {
 }
 
 dmExtension::Result FinalizeAppodeal(dmExtension::Params* params) {
-	finalize();
     return dmExtension::RESULT_OK;
 }
 
 static dmExtension::Result UpdateAppodeal(dmExtension::Params* params) {
-	callback_updates();
     return dmExtension::RESULT_OK;
 }
 
@@ -435,47 +436,47 @@ static int setUserAge(lua_State* L) { return 0; }
 static int setUserGender(lua_State* L) { return 0; }
 
 static const luaL_reg Module_methods[] = {
-  {"setCallback", setCallback},
-  {"isSupported", isSupported},
-  {"initialize", initialize},
-  {"show", show},
-  {"showWithPlacement", showWithPlacement},
-  {"isLoaded", isLoaded},
-  {"cache", сache},
-  {"hide", hide},
-  {"setAutoCache", setAutoCache},
-  {"isPrecache", isPrecache},
-  {"setSmartBanners", setSmartBanners},
-  {"setBannerBackground", setBannerBackground},
-  {"setBannerAnimation", setBannerAnimation},
-  {"setTabletBanners", setTabletBanners},
-  {"setLogLevel", setLogLevel},
-  {"setTesting", setTesting},
-  {"setChildDirectedTreatment", setChildDirectedTreatment},
-  {"setTriggerOnLoadedOnPrecache", setTriggerOnLoadedOnPrecache},
-  {"disableNetwork", disableNetwork},
-  {"disableNetworkForAdType", disableNetworkForAdType},
-  {"disableLocationPermissionCheck", disableLocationPermissionCheck},
-  {"disableWriteExternalStoragePermissionCheck", disableWriteExternalStoragePermissionCheck},
-  {"requestAndroidMPermissions", requestAndroidMPermissions},
-  {"muteVideosIfCallsMuted", muteVideosIfCallsMuted},
-  {"showTestScreen", showTestScreen},
-  {"getNativeSDKVersion", getNativeSDKVersion},
-  {"canShow", canShow},
-  {"canShowWithPlacement", canShowWithPlacement},
-  {"setCustomIntRule", setCustomIntRule},
-  {"setCustomBoolRule", setCustomBoolRule},
-  {"setCustomDoubleRule", setCustomDoubleRule},
-  {"setCustomStringRule", setCustomStringRule},
-  {"trackInAppPurchase", trackInAppPurchase},
-  {"getRewardName", getRewardName},
-  {"getRewardAmount", getRewardAmount},
-  {"getRewardNameForPlacement", getRewardNameForPlacement},
-  {"getRewardAmountForPlacement", getRewardAmountForPlacement},
-  {"setUserId", setUserId},
-  {"setUserAge", setUserAge},
-  {"setUserGender", setUserGender},
-  {0, 0}
+    {"setCallback", setCallback},
+    {"isSupported", isSupported},
+    {"initialize", initialize},
+    {"show", show},
+    {"showWithPlacement", showWithPlacement},
+    {"isLoaded", isLoaded},
+    {"cache", сache},
+    {"hide", hide},
+    {"setAutoCache", setAutoCache},
+    {"isPrecache", isPrecache},
+    {"setSmartBanners", setSmartBanners},
+    {"setBannerBackground", setBannerBackground},
+    {"setBannerAnimation", setBannerAnimation},
+    {"setTabletBanners", setTabletBanners},
+    {"setLogLevel", setLogLevel},
+    {"setTesting", setTesting},
+    {"setChildDirectedTreatment", setChildDirectedTreatment},
+    {"setTriggerOnLoadedOnPrecache", setTriggerOnLoadedOnPrecache},
+    {"disableNetwork", disableNetwork},
+    {"disableNetworkForAdType", disableNetworkForAdType},
+    {"disableLocationPermissionCheck", disableLocationPermissionCheck},
+    {"disableWriteExternalStoragePermissionCheck", disableWriteExternalStoragePermissionCheck},
+    {"requestAndroidMPermissions", requestAndroidMPermissions},
+    {"muteVideosIfCallsMuted", muteVideosIfCallsMuted},
+    {"showTestScreen", showTestScreen},
+    {"getNativeSDKVersion", getNativeSDKVersion},
+    {"canShow", canShow},
+    {"canShowWithPlacement", canShowWithPlacement},
+    {"setCustomIntRule", setCustomIntRule},
+    {"setCustomBoolRule", setCustomBoolRule},
+    {"setCustomDoubleRule", setCustomDoubleRule},
+    {"setCustomStringRule", setCustomStringRule},
+    {"trackInAppPurchase", trackInAppPurchase},
+    {"getRewardName", getRewardName},
+    {"getRewardAmount", getRewardAmount},
+    {"getRewardNameForPlacement", getRewardNameForPlacement},
+    {"getRewardAmountForPlacement", getRewardAmountForPlacement},
+    {"setUserId", setUserId},
+    {"setUserAge", setUserAge},
+    {"setUserGender", setUserGender},
+    {0, 0}
 };
 
 static void LuaInit(lua_State* L) {

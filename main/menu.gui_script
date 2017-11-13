@@ -5,11 +5,9 @@ function init(self)
     self.radio_value = appodeal.BANNER
 end
 
-local function appodeal_ads_callback(self, msg_type, message)
-	print("Apppodeal Callback msg_type: " .. msg_type .. ", message: " .. message)
-
-	--[[ if msg_type == appodeal.BANNER_LOADED then
-		print("BANNER_LOADED, is precache")
+local function appodeal_ads_callback(self, msg_type)
+	if msg_type == appodeal.BANNER_LOADED then
+		print("BANNER_LOADED")
 	elseif msg_type == appodeal.BANNER_FAILED_TO_LOAD then
 		print("BANNER_FAILED_TO_LOAD")
 	elseif msg_type == appodeal.BANNER_SHOWN then
@@ -17,6 +15,7 @@ local function appodeal_ads_callback(self, msg_type, message)
 	elseif msg_type == appodeal.BANNER_CLICKED then
 		print("BANNER_CLICKED")
 	elseif msg_type == appodeal.INTERSTITIAL_LOADED then
+		appodeal.show(appodeal.INTERSTITIAL)
 		print("INTERSTITIAL_LOADED")
 	elseif msg_type == appodeal.INTERSTITIAL_FAILED_TO_LOAD then
 		print("INTERSTITIAL_FAILED_TO_LOAD")
@@ -33,7 +32,7 @@ local function appodeal_ads_callback(self, msg_type, message)
 	elseif msg_type == appodeal.REWARDED_VIDEO_SHOWN then
 		print("REWARDED_VIDEO_SHOWN")
 	elseif msg_type == appodeal.REWARDED_VIDEO_FISNIHED then
-		print("REWARDED_VIDEO_FISNIHED", message.amount, message.name)
+		print("REWARDED_VIDEO_FISNIHED")
 	elseif msg_type == appodeal.REWARDED_VIDEO_CLOSED then
 		print("REWARDED_VIDEO_CLOSED")
 	elseif msg_type == appodeal.NON_SKIPPABLE_VIDEO_LOADED then
@@ -46,7 +45,7 @@ local function appodeal_ads_callback(self, msg_type, message)
 		print("NON_SKIPPABLE_VIDEO_FISNIHED")
 	elseif msg_type == appodeal.NON_SKIPPABLE_VIDEO_CLOSED then
 		print("NON_SKIPPABLE_VIDEO_CLOSED")
-	end --]]
+	end
 end
 
 function on_input(self, action_id, action)
@@ -56,6 +55,7 @@ function on_input(self, action_id, action)
 	self.radio_value = dirtylarry:radio("radio_nonskippable", action_id, action, appodeal.NON_SKIPPABLE_VIDEO, self.radio_value)
 
 	dirtylarry:button("initialize", action_id, action, function ()
+		appodeal.setCallback(appodeal_ads_callback)
 		appodeal.setSmartBanners(false)
 		appodeal.setBannerBackground(false)
 		appodeal.setBannerAnimation(false)
@@ -80,7 +80,6 @@ function on_input(self, action_id, action)
 		appodeal.setUserAge(26)
 		appodeal.setUserGender(appodeal.GENDER_MALE)
 		appodeal.setAutoCache(appodeal.INTERSTITIAL, false)
-		appodeal.setCallback(appodeal_ads_callback)
 		if sys.get_sys_info().system_name == "Android" then
 			appodeal.initialize("fee50c333ff3825fd6ad6d38cff78154de3025546d47a84f", self.radio_value)
 		elseif sys.get_sys_info().system_name == "iPhone OS" then

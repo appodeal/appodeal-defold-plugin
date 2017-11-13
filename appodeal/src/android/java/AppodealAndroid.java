@@ -71,34 +71,33 @@ public class AppodealAndroid {
 
 
     public static void Appodeal_Initialize(final Activity activity, final String appKey, final int adType) {
-        if((adType & 3) > 0) {
-            Appodeal.setInterstitialCallbacks(interstitialCallbacks);
-        }
-
-        if((adType & 4) > 0) {
-            Appodeal.setBannerCallbacks(bannerCallbacks);
-        }
-
-        if((adType & 8) > 0) {
-            Appodeal.setBannerCallbacks(bannerCallbacks);
-        }
-
-        if((adType & 16) > 0) {
-            Appodeal.setBannerCallbacks(bannerCallbacks);
-        }
-
-        if((adType & 128) > 0) {
-            Appodeal.setRewardedVideoCallbacks(rewardedVideoCallbacks);
-        }
-
-        if((adType & 256) > 0) {
-            Appodeal.setNonSkippableVideoCallbacks(nonSkippableVideoCallbacks);
-        }
-
-		Appodeal.setFramework("defold", "2.1.7", true, false);
-
-        activity.runOnUiThread(new Runnable(){
+    	activity.runOnUiThread(new Runnable() {
             public void run() {
+		    	if((adType & 3) > 0) {
+		            Appodeal.setInterstitialCallbacks(interstitialCallbacks);
+		        }
+		
+		        if((adType & 4) > 0) {
+		            Appodeal.setBannerCallbacks(bannerCallbacks);
+				}
+		
+		        if((adType & 8) > 0) {
+		            Appodeal.setBannerCallbacks(bannerCallbacks);
+		        }
+		
+		        if((adType & 16) > 0) {
+		            Appodeal.setBannerCallbacks(bannerCallbacks);
+		        }
+		
+		        if((adType & 128) > 0) {
+		            Appodeal.setRewardedVideoCallbacks(rewardedVideoCallbacks);
+		        }
+		
+		        if((adType & 256) > 0) {
+		            Appodeal.setNonSkippableVideoCallbacks(nonSkippableVideoCallbacks);
+		        }
+
+				Appodeal.setFramework("defold", "2.1.7", true, false);
                 Appodeal.initialize(activity, appKey, getNativeAdType(adType));
             }
         });
