@@ -125,11 +125,18 @@ static JNIEnv* Attach() {
 }
 
 static bool Detach(JNIEnv* env) {
-	bool exception = (bool) env->ExceptionCheck();
-	env->ExceptionClear();
-	JavaVM* vm = dmGraphics::GetNativeAndroidJavaVM();
-	vm->DetachCurrentThread();
-	return !exception;
+    bool exception = (bool) env->ExceptionCheck();
+    env->ExceptionClear();
+    JavaVM* vm = dmGraphics::GetNativeAndroidJavaVM();
+    
+    switch (vm->GetEnv((void**)&env, JNI_VERSION_1_6)) {
+    case JNI_OK:
+        break;
+    case JNI_EDETACHED:
+        vm->DetachCurrentThread();
+        break;
+    }
+    return !exception;
 }
 
 namespace {
