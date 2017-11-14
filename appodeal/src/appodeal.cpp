@@ -8,12 +8,6 @@
 #if defined(DM_PLATFORM_IOS) || defined(DM_PLATFORM_ANDROID)
 #include "appodeal.h"
 
-#if defined(DM_PLATFORM_IOS)
-#include "ios/appodeal_ios.h"
-#elif defined(DM_PLATFORM_ANDROID)
-#include "android/appodeal_android.h"
-#endif
-
 AppodealListener g_appodealListener;
 
 static int setCallback(lua_State* L) {
@@ -41,7 +35,7 @@ static int show(lua_State* L) {
 }
 
 static int showWithPlacement(lua_State* L) {
-	  bool status = Appodeal_ShowWithPlacement(L);
+	bool status = Appodeal_ShowWithPlacement(L);
     lua_pushboolean(L, status);
     return 1;
 }
