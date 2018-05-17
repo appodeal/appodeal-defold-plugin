@@ -369,7 +369,7 @@ static int isLoaded(lua_State* L) {
  	lua_pushboolean(L, false);
 	return 1;
 }
-static int сache(lua_State* L) { return 0; }
+static int cache(lua_State* L) { return 0; }
 static int hide(lua_State* L) { return 0; }
 static int setAutoCache(lua_State* L) { return 0; }
 static int isPrecache(lua_State* L) {
@@ -436,7 +436,7 @@ static const luaL_reg Module_methods[] = {
     {"show", show},
     {"showWithPlacement", showWithPlacement},
     {"isLoaded", isLoaded},
-    {"cache", сache},
+    {"cache", cache},
     {"hide", hide},
     {"setAutoCache", setAutoCache},
     {"isPrecache", isPrecache},
